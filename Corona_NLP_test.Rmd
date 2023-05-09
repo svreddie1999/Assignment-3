@@ -1,0 +1,46 @@
+---
+title: "R Notebook"
+output:
+  word_document: default
+  html_notebook: default
+  pdf_document: default
+---
+# Install and load required libraries
+
+```{r}
+if (!require("tm")) install.packages("tm")
+if (!require("wordcloud")) install.packages("wordcloud")
+library(tm)
+library(wordcloud)
+```
+
+
+```{r}
+# Load data
+tweets <- read.csv("C:/Users/fvcds/Desktop/150$/Project/Corona_NLP_test.csv")
+
+# Convert text to corpus
+corpus <- Corpus(VectorSource(tweets$OriginalTweet))
+
+# Clean corpus
+corpus <- tm_map(corpus, tolower)
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, removeNumbers)
+corpus <- tm_map(corpus, removeWords, stopwords("english"))
+corpus <- tm_map(corpus, stripWhitespace)
+
+# Convert corpus to document term matrix
+dtm <- DocumentTermMatrix(corpus)
+
+# Calculate word frequencies
+word_freq <- colSums(as.matrix(dtm))
+
+# Sort words by frequency
+sorted_freq <- sort(word_freq, decreasing = TRUE)
+
+# Create word cloud
+wordcloud(names(sorted_freq), freq = sorted_freq, min.freq = 5, max.words = 100, random.order = FALSE, colors = brewer.pal(8, "Dark2"))
+
+
+```
+
